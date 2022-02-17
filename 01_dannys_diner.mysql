@@ -220,7 +220,7 @@ WITH multipliers AS (
             WHEN s.product_id = 1 THEN 2
             ELSE 1
         END sushi_multiplier,
-  		  CASE
+        CASE
             WHEN s.product_id = 1 THEN 1
   			   WHEN s.order_date BETWEEN mem.join_date AND mem.join_date + 7 THEN 2 
             ELSE 1 
