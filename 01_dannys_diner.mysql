@@ -7,18 +7,17 @@
 -- 1. What is the total amount each customer spent at the restaurant?
 
 SELECT
-	s.customer_id,
+    s.customer_id,
     SUM(m.price)
 FROM dannys_diner.sales s
-INNER JOIN dannys_diner.menu m
-	ON m.product_id = s.product_id
+INNER JOIN dannys_diner.menu m ON m.product_id = s.product_id
 GROUP BY s.customer_id
 ORDER BY s.customer_id;
 
 -- 2. How many days has each customer visited the restaurant?
 
 SELECT
-	customer_id,
+    customer_id,
     COUNT(DISTINCT(order_date))
 FROM dannys_diner.sales
 GROUP BY customer_id
@@ -29,18 +28,17 @@ ORDER BY customer_id;
 WITH order_ranks AS (
   SELECT
     *,
-      RANK() OVER(PARTITION BY customer_id
-                  ORDER BY order_date) order_rank
+    RANK() OVER(PARTITION BY customer_id
+                ORDER BY order_date) order_rank
   FROM dannys_diner.sales
 )
 
 SELECT 
-	o_r.customer_id,
+  o_r.customer_id,
   o_r.order_rank,
   m.product_name
 FROM order_ranks o_r
-INNER JOIN dannys_diner.menu m 
-  ON m.product_id = o_r.product_id
+INNER JOIN dannys_diner.menu m ON m.product_id = o_r.product_id
 WHERE o_r.order_rank = 1
 ORDER BY o_r.customer_id;
 
@@ -52,8 +50,7 @@ WITH highest_selling_prod AS (
         m.product_name product_name,
         COUNT(s.*) total_purchases
     FROM dannys_diner.sales s
-    INNER JOIN dannys_diner.menu m
-        ON m.product_id = s.product_id
+    INNER JOIN dannys_diner.menu m ON m.product_id = s.product_id
     GROUP BY 
         s.product_id,
         m.product_name
@@ -62,14 +59,13 @@ WITH highest_selling_prod AS (
 )
 
 SELECT
-	s1.customer_id,
+    s1.customer_id,
     h.product_name,
     COUNT(s1.*)
 FROM dannys_diner.sales s1
-INNER JOIN highest_selling_prod h
-	ON h.product_id = s1.product_id
+INNER JOIN highest_selling_prod h ON h.product_id = s1.product_id
 GROUP BY 
-	s1.customer_id,
+    s1.customer_id,
     h.product_name;
 
 -- 5. Which item was the most popular for each customer?
@@ -96,13 +92,12 @@ ranks AS (
 )
 
 SELECT
-	r.customer_id,
+  r.customer_id,
   m.product_name,
   r.orders_per_item,
   r.order_rank
 FROM ranks r
-INNER JOIN dannys_diner.menu m 
-  ON m.product_id = r.product_id
+INNER JOIN dannys_diner.menu m ON m.product_id = r.product_id
 WHERE r.order_rank = 1
 ORDER BY r.customer_id;
 
@@ -110,12 +105,12 @@ ORDER BY r.customer_id;
 
 WITH member_orders AS(
   SELECT
-	s.customer_id,
+  s.customer_id,
   mem.join_date,
   s.order_date,
   m.product_name,
   RANK() OVER(PARTITION BY s.customer_id
-             	ORDER BY s.order_date) order_rank
+              ORDER BY s.order_date) order_rank
   FROM dannys_diner.sales s
   INNER JOIN dannys_diner.menu m ON m.product_id = s.product_id
   INNER JOIN dannys_diner.members mem ON mem.customer_id = s.customer_id
