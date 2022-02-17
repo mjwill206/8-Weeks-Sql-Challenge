@@ -182,3 +182,26 @@ FROM points_table
 GROUP BY customer_id
 ORDER BY customer_id;
 
+
+-- BONUS QUESTIONS
+
+-- Join All The Things
+-- The following questions are related creating basic data tables that Danny and his team can use to quickly derive insights without needing to join the underlying tables using SQL.
+
+-- Recreate the following table output using the available data:
+SELECT
+   s.customer_id,
+   s.order_date,
+   m.product_name,
+   m.price,
+   CASE
+      WHEN s.order_date >= mem.join_date THEN 'Y'
+      ELSE 'N'
+   END member
+FROM dannys_diner.sales s
+INNER JOIN dannys_diner.menu m ON m.product_id = s.product_id
+FULL OUTER JOIN dannys_diner.members mem ON mem.customer_id = s.customer_id
+ORDER BY
+   s.customer_id,
+   s.order_date,
+   m.price DESC
