@@ -220,33 +220,20 @@ WITH multipliers AS (
             WHEN s.product_id = 1 THEN 2
             ELSE 1
         END sushi_multiplier,
-  	CASE
-            WHEN s.order_date BETWEEN mem.join_date AND mem.join_date + 7 THEN 2 
+  		  CASE
+            WHEN s.product_id = 1 THEN 1
+  			   WHEN s.order_date BETWEEN mem.join_date AND mem.join_date + 7 THEN 2 
             ELSE 1 
-        END new_mem_multiplier
+        END new_member_multiplier
     FROM dannys_diner.sales s
     FULL JOIN dannys_diner.members mem ON mem.customer_id = s.customer_id
     INNER JOIN dannys_diner.menu m ON m.product_id = s.product_id
-  ),
-  
-revised_multiplier AS(
-    SELECT 
-      customer_id,
-      product_id,
-      order_date,
-      price,
-      sushi_multiplier,
-      CASE
-          WHEN sushi_multiplier = 2 THEN 1
-          ELSE new_mem_multiplier
-      END new_member_multiplier
-    FROM multipliers
-)
+  )
 
 SELECT
     customer_id,
     SUM(price * 10 * sushi_multiplier * new_member_multiplier) points
-FROM revised_multiplier
+FROM multipliers
 WHERE customer_id IN (SELECT customer_id 
                       FROM dannys_diner.members)
 GROUP BY customer_id
