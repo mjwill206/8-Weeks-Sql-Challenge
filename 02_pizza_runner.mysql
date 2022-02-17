@@ -17,7 +17,7 @@ FROM pizza_runner.customer_orders
 -- How many successful orders were delivered by each runner?
 
 SELECT 
-	runner_id,
+  runner_id,
   COUNT(*) successful_deliveries
 FROM pizza_runner.runner_orders
 WHERE (cancellation LIKE '%Cancellation') IS NOT TRUE
@@ -28,14 +28,14 @@ ORDER BY runner_id
 
 WITH successful_deliveries AS (
 SELECT 
-	*
+  *
 FROM pizza_runner.runner_orders
 WHERE (cancellation LIKE '%Cancellation') IS NOT TRUE
 )
   
   
 SELECT 
-	pn.pizza_name,
+  pn.pizza_name,
   COUNT(co.*)
 FROM pizza_runner.customer_orders co
 INNER JOIN pizza_runner.pizza_names pn ON pn.pizza_id = co.pizza_id
