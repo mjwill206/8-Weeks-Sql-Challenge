@@ -103,7 +103,31 @@ ORDER BY r.customer_id;
 
 -- 6. Which item was purchased first by the customer after they became a member?
 
-
+SELECT 
+	DISTINCT(customer_id),
+    FIRST_VALUE(product_name) OVER(PARTITION BY customer_id
+                                  ORDER BY order_date)
+FROM (                                 
+  SELECT
+      s.customer_id,
+      s.order_date,
+      mem.join_date,
+      CASE
+      	WHEN s.order_date >= mem.join_date THEN 'Y'
+        ELSE 'N'
+      END "member?",
+      m.product_name
+  FROM dannys_diner.sales s
+  INNER JOIN dannys_diner.menu m ON m.product_id = s.product_id
+  FULL JOIN dannys_diner.members mem ON mem.customer_id = s.customer_id
+  ORDER BY
+  	customer_id,
+    order_date
+  ) t
+WHERE 
+	"member?" = 'Y'
+    AND customer_id IN (SELECT customer_id
+                        FROM dannys_diner.members)
   
 
 -- 7. Which item was purchased just before the customer became a member?
