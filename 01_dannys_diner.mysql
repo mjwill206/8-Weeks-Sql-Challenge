@@ -3,44 +3,43 @@
 /* --------------------
    Case Study Questions
    --------------------*/
+WITH sales AS (SELECT * FROM dannys_diner.sales),
+menu AS (SELECT * FROM dannys_diner.menu),
+members AS (SELECT * FROM dannys_diner.members)
 
 -- 1. What is the total amount each customer spent at the restaurant?
 
 SELECT
-    s.customer_id,
-    SUM(m.price)
-FROM dannys_diner.sales s
-INNER JOIN dannys_diner.menu m ON m.product_id = s.product_id
+	s.customer_id,
+	SUM(price) total_spend
+FROM sales s
+INNER JOIN menu m ON m.product_id = s.product_id
 GROUP BY s.customer_id
 ORDER BY s.customer_id;
 
 -- 2. How many days has each customer visited the restaurant?
 
 SELECT
-    customer_id,
-    COUNT(DISTINCT(order_date))
-FROM dannys_diner.sales
+	customer_id,
+	COUNT(DISTINCT(order_date)) n_days_visited
+FROM sales
 GROUP BY customer_id
 ORDER BY customer_id;
 
 -- 3. What was the first item from the menu purchased by each customer?
 
-WITH order_ranks AS (
-  SELECT
-    *,
-    RANK() OVER(PARTITION BY customer_id
-                ORDER BY order_date) order_rank
-  FROM dannys_diner.sales
-)
-
 SELECT 
-  o_r.customer_id,
-  o_r.order_rank,
-  m.product_name
-FROM order_ranks o_r
-INNER JOIN dannys_diner.menu m ON m.product_id = o_r.product_id
-WHERE o_r.order_rank = 1
-ORDER BY o_r.customer_id;
+	s.customer_id,
+	m.product_name
+FROM (
+	SELECT
+		customer_id,
+		product_id,
+	    	ROW_NUMBER() OVER(PARTITION BY customer_id
+				  ORDER BY order_date) order_rank
+	FROM sales) s
+INNER JOIN menu m ON m.product_id = s.product_id
+WHERE order_rank = 1;
 
 -- 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
 
